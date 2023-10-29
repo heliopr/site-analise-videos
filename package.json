@@ -4,9 +4,12 @@
   "description": "",
   "main": "src/backend/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "processarVideos": "rm -rf videos && mkdir videos && node ./scripts/processarVideos.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2"
+  }
 }
