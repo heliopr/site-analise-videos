@@ -37,14 +37,16 @@ const f = async () => {
 
         try {
             const metadata = await pegarMetadata(`processar/${videoArquivo}`)
-            const frameRate = metadata["streams"][0]["r_frame_rate"]
+            const avgFrameRate = metadata["streams"][0]["avg_frame_rate"].split("/")
+            const frameRate = (parseInt(avgFrameRate[0])/parseInt(avgFrameRate[1])).toFixed(2)
+            //console.log(frameRate)
 
             const inicio = performance.now()
             //ffmpeg -y -i video.mp4 -filter:v "setpts=PTS/30,fps=30" -an output.mp4
             spawnSync("ffmpeg", [
                 "-y",
                 "-i", `processar/${videoArquivo}`,
-                "-filter:v", `setpts=PTS/${frameRate},fps=${frameRate}`,
+                "-vf", `setpts=PTS/${frameRate}`,
                 "-an",
                 `videos/${videoArquivo}`
             ])
