@@ -59,6 +59,7 @@ const f = async () => {
             const processadoMetadata = await pegarMetadata(processadoPath)
 
             videosJson[videoArquivo] = {
+                nome: videoArquivo,
                 fps: frameRate,
                 duracaoOriginal: processarMetadata["streams"][0]["duration"],
                 duracao: processadoMetadata["streams"][0]["duration"],
