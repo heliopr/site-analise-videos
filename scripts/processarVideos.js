@@ -15,6 +15,8 @@ function pegarMetadata(video) {
     })
 }
 
+const videosJson = {}
+
 const f = async () => {
     if (!fs.existsSync("./processar/")) {
         console.log("Diretório '/processar/' inexistente.")
@@ -33,11 +35,13 @@ const f = async () => {
     const inicio = performance.now()
     for (let i = 0; i < videos.length; i++) {
         const videoArquivo = videos[i]
+        const processadoPath = `videos/${videoArquivo}`
+        const processarPath = `processar/${videoArquivo}`
         console.log(`Processando vídeo '${videoArquivo}'`)
 
         try {
-            const metadata = await pegarMetadata(`processar/${videoArquivo}`)
-            const avgFrameRate = metadata["streams"][0]["avg_frame_rate"].split("/")
+            const processarMetadata = await pegarMetadata(processarPath)
+            const avgFrameRate = processarMetadata["streams"][0]["avg_frame_rate"].split("/")
             const frameRate = (parseInt(avgFrameRate[0])/parseInt(avgFrameRate[1])).toFixed(2)
             //console.log(frameRate)
 
@@ -45,13 +49,22 @@ const f = async () => {
             //ffmpeg -y -i video.mp4 -filter:v "setpts=PTS/30,fps=30" -an output.mp4
             spawnSync("ffmpeg", [
                 "-y",
-                "-i", `processar/${videoArquivo}`,
+                "-i", processarPath,
                 "-vf", `setpts=PTS/${frameRate}`,
                 "-an",
-                `videos/${videoArquivo}`
+                processadoPath
             ])
             const tempo = performance.now() - inicio
 
+            const processadoMetadata = await pegarMetadata(processadoPath)
+
+            videosJson[videoArquivo] = {
+                fps: frameRate,
+                duracaoOriginal: processarMetadata["streams"][0]["duration"],
+                duracao: processadoMetadata["streams"][0]["duration"],
+                tamanho: processadoMetadata["format"]["size"],
+                frames: processadoMetadata["streams"][0]["nb_frames"]
+            }
             console.log(`'${videoArquivo}' processado em ${(tempo / 1000).toFixed(2)}s (${tempo.toFixed(1)}ms)`)
         }
         catch (e) {
@@ -61,6 +74,7 @@ const f = async () => {
     }
     const tempo = performance.now() - inicio
 
+    fs.writeFileSync("videos.json", JSON.stringify(videosJson))
     console.log(`${videos.length} vídeos processados com sucesso em ${Math.round(tempo / 1000)}s`)
 }
 
