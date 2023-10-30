@@ -31,6 +31,7 @@ const f = async () => {
     }
 
     console.log(`Processando ${videos.length} vídeos`)
+    let c = 0
 
     const inicio = performance.now()
     for (let i = 0; i < videos.length; i++) {
@@ -67,6 +68,7 @@ const f = async () => {
                 frames: processadoMetadata["streams"][0]["nb_frames"]
             }
             console.log(`'${videoArquivo}' processado em ${(tempo / 1000).toFixed(2)}s (${tempo.toFixed(1)}ms)`)
+            c += 1
         }
         catch (e) {
             console.log(`Ocorreu um erro ao tentar processar '${videoArquivo}'`)
@@ -76,7 +78,7 @@ const f = async () => {
     const tempo = performance.now() - inicio
 
     fs.writeFileSync("videos.json", JSON.stringify(videosJson))
-    console.log(`${videos.length} vídeos processados com sucesso em ${Math.round(tempo / 1000)}s`)
+    console.log(`${c} vídeos processados com sucesso em ${Math.round(tempo / 1000)}s`)
 }
 
 f()

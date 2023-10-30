@@ -1,8 +1,8 @@
 node_modules
 
+videos.json
 video.mp4
+
 videos/
 processar/
 ignorar/
-
-videos.json
