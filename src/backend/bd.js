@@ -15,6 +15,7 @@ bd.conectar = async () => {
     console.log("[BD] Conectado com sucesso")
 
     bd.bd = bd.cliente.db(env.BD_DB)
+    bd.marcacoes = bd.bd.collection("marcacoes")
 }
 
 bd.estaConectado = async () => {
