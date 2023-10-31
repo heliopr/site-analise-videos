@@ -1,10 +1,8 @@
 require('dotenv').config()
 const express = require("express")
-const path = require("path")
 const bd = require("./bd")
 
 const config = require("../../config.json")
-const videos = require("../../videos.json")
 
 const app = express()
 let servidor

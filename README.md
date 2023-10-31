@@ -3,9 +3,9 @@
 ## Instruções
 
 ### Processar vídeos
-1. Criar pasta `processar` com os videos para processar dentro dela
+1. Crie uma pasta `processar` com os videos para processar dentro dela
 2. Rode `npm run processarVideos`
-3. Aguardar
+3. Aguarde
 4. Vídeos processados vão estar na pasta `videos` e no arquivo `videos.json`
 
 ### Rodar o servidor

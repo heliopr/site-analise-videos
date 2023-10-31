@@ -61,7 +61,7 @@ const f = async () => {
 
             videosJson[videoArquivo] = {
                 nome: videoArquivo,
-                fps: frameRate,
+                fps: parseFloat(frameRate),
                 duracaoOriginal: processarMetadata["streams"][0]["duration"],
                 duracao: processadoMetadata["streams"][0]["duration"],
                 tamanho: processadoMetadata["format"]["size"],
