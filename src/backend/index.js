@@ -1,21 +1,36 @@
+require('dotenv').config()
 const express = require("express")
 const path = require("path")
+const bd = require("./bd")
 
 const config = require("../../config.json")
 const videos = require("../../videos.json")
 
 const app = express()
+let servidor
 
-app.get("/videos/:video", (req, res) => {
-    const video = req.params["video"]
-    res.json(videos[video] || {})
-})
 
-app.get("/videos/:video/arquivo", (req, res) => {
-    const video = req.params["video"]
-    res.sendFile(path.join(__dirname, "../../videos/", video))
-})
+async function fechar() {
+    console.log("\n\nFechando servidor")
+    await servidor.close()
+    console.log("Servidor fechado")
+    await bd.encerrarConexao()
+    console.log("Saindo...")
+    process.exit(0)
+}
 
-app.listen(config.porta, () => {
-    console.log(`Servidor aberto na porta ${config.porta}`)
-})
+const f = async () => {
+
+    await bd.conectar()
+
+    app.use(require("./rotas/videos"))
+
+    servidor = app.listen(config.porta, () => {
+        console.log(`Servidor aberto na porta ${config.porta}`)
+    })
+
+    process.on("SIGINT", fechar)
+    process.on("SIGTERM", fechar)
+}
+
+f()
