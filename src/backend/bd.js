@@ -17,6 +17,19 @@ bd.conectar = async () => {
     bd.bd = bd.cliente.db(env.BD_DB)
 }
 
+bd.estaConectado = async () => {
+    try {
+        if (!bd.cliente) return false
+
+        let res = await bd.cliente.db().admin().ping()
+
+        return res != undefined && res.ok != undefined && res.ok === 1
+    }
+    catch (e) {
+        return false
+    }
+}
+
 bd.encerrarConexao = async () => {
     console.log("[BD] Fechando conexão")
     await bd.cliente.close()

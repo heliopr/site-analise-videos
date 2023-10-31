@@ -1,3 +1,4 @@
 {
-    "porta": 1234
+    "porta": 1234,
+    "mostrarErros": true
 }

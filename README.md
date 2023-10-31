@@ -10,7 +10,8 @@
 
 ### Rodar o servidor
 1. Crie um arquivo chamado `.env` e siga o exemplo abaixo, configurando de acordo com o seu banco de dados MongoDB
-2. Rode `node .`
+2. Rode `npm install` para instalar as dependências
+3. Rode `node .`
 
 ## Exemplo .env
 ```
