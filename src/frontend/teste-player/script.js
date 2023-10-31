@@ -10,7 +10,7 @@ video.addEventListener('loadedmetadata', function () {
     }, 1000)
 })*/
 
-
+let p = true
 const video = document.querySelector("#video")
 const frames = document.querySelector("#frame")
 const fps = 30
@@ -47,3 +47,23 @@ document.addEventListener("keypress", (e) => {
 setInterval(() => {
     frame.textContent = "Frame " + Math.round(video.currentTime * 30)
 }, 100)
+
+
+
+$(document).ready(function() {
+    $("video").on("click", function(event) {
+        
+        var x = event.pageX - this.offsetLeft;
+        var y = event.pageY - this.offsetTop;
+        alert("X Coordinate: " + x + " Y Coordinate: " + y);
+        if (p){
+            coords1.textContent = "Coordenadas " + "x:" + x + " y:" + y
+            p = false
+            coords2.textContent = ""
+        }else{
+            coords2.textContent = "Coordenadas " + "x:" + x + " y:" + y
+            p = true
+        }
+        
+    });
+});
