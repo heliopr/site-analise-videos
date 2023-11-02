@@ -53,12 +53,16 @@ function validarMarcacoes(marcacoes) {
 
 
 router.get("/videos", tentar((req, res) => {
-    res.status(200).json(Object.keys(videosJson))
+    res.status(200).json({ sucesso: true, videos: Object.keys(videosJson)})
 }))
 
 router.get("/videos/:video", tentar((req, res) => {
     const video = req.params["video"]
-    res.status(200).json(videosJson[video] || {})
+    if (videosJson[video] == undefined) {
+        return res.status(400).json({ sucesso: false, mensagem: "Vídeo não encontrado" })
+    }
+
+    res.status(200).json({ sucesso: true, video: videosJson[video] })
 }))
 
 router.get("/videos/:video/arquivo", tentar((req, res) => {
