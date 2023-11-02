@@ -107,7 +107,27 @@ router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (re
     }
 
     await bd.marcacoes.insertOne({ nome: video, marcacoes: marcacoes })
+    res.status(200).json({ sucesso: true })
+}))
 
+router.put("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (req, res) => {
+    const video = req.params["video"]
+    const marcacoes = req.body["marcacoes"]
+
+    if (videosJson[video] == undefined) {
+        return res.status(400).json({ sucesso: false, mensagem: "Vídeo não encontrado" })
+    }
+
+    const mensagem = validarMarcacoes(marcacoes)
+    if (mensagem != null) {
+        return res.status(400).json({ sucesso: false, mensagem: mensagem })
+    }
+
+    if (await bd.marcacoes.findOne({ nome: video }) == null) {
+        return res.status(400).json({ sucesso: false, mensagem: "Marcações não existem para este vídeo" })
+    }
+
+    await bd.marcacoes.updateOne({ nome: video }, { $set: { marcacoes: marcacoes } })
     res.status(200).json({ sucesso: true })
 }))
 
