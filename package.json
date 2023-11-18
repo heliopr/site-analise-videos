@@ -4,8 +4,7 @@
   "description": "",
   "main": "src/backend/index.js",
   "scripts": {
-    "lprocessarVideos": "rm -rf videos && mkdir videos && node ./scripts/processarVideos.js",
-    "wprocessarVideos": "rmdir videos && mkdir videos && node ./scripts/processarVideos.js"
+    "processarVideos": "node ./scripts/processarVideos.js"
   },
   "keywords": [],
   "author": "",

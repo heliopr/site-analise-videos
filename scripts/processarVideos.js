@@ -1,6 +1,9 @@
+require('dotenv').config()
 const fs = require("fs")
 const ffmpeg = require("fluent-ffmpeg")
 const { spawnSync } = require("child_process")
+
+const bd = require("../src/backend/bd")
 
 function pegarMetadata(video) {
     return new Promise((resolve, reject) => {
@@ -15,20 +18,39 @@ function pegarMetadata(video) {
     })
 }
 
-const videosJson = {}
+async function fechar() {
+    if (await bd.estaConectado()) {
+        await bd.encerrarConexao()
+    }
+    process.exit(0)
+}
 
 const f = async () => {
+    process.on("SIGINT", fechar)
+    process.on("SIGTERM", fechar)
+
     if (!fs.existsSync("./processar/")) {
-        console.log("Diretório '/processar/' inexistente.")
-        return
+        console.log("Diretório '/processar/' inexistente, nenhum vídeo para processar.")
+        process.exit()
     }
 
     const videos = fs.readdirSync("./processar/")
 
     if (videos.length == 0) {
         console.log("Não há vídeos para processar.")
-        return
+        process.exit()
     }
+
+    await bd.conectar()
+    if (!await bd.estaConectado()) {
+        console.log("[BD] Não foi possível conectar ao banco de dados")
+        return await fechar()
+    }
+
+    if (!fs.existsSync("./videos/")) {
+        fs.mkdirSync("videos")
+    }
+
 
     console.log(`Processando ${videos.length} vídeos`)
     let c = 0
@@ -36,6 +58,12 @@ const f = async () => {
     const inicio = performance.now()
     for (let i = 0; i < videos.length; i++) {
         const videoArquivo = videos[i]
+
+        if (await bd.videosCollection.findOne({nome: videoArquivo})) {
+            console.log(`O vídeo '${videoArquivo}' já está no banco de dados. PULANDO VÍDEO...`)
+            continue
+        }
+
         const processadoPath = `videos/${videoArquivo}`
         const processarPath = `processar/${videoArquivo}`
         console.log(`Processando vídeo '${videoArquivo}'`)
@@ -59,14 +87,14 @@ const f = async () => {
 
             const processadoMetadata = await pegarMetadata(processadoPath)
 
-            videosJson[videoArquivo] = {
+            bd.videosCollection.insertOne({
                 nome: videoArquivo,
                 fps: parseFloat(frameRate),
                 duracaoOriginal: processarMetadata["streams"][0]["duration"],
                 duracao: processadoMetadata["streams"][0]["duration"],
                 tamanho: processadoMetadata["format"]["size"],
                 frames: processadoMetadata["streams"][0]["nb_frames"]
-            }
+            })
             console.log(`'${videoArquivo}' processado em ${(tempo / 1000).toFixed(2)}s (${tempo.toFixed(1)}ms)`)
             c += 1
         }
@@ -75,10 +103,11 @@ const f = async () => {
             console.log(e)
         }
     }
-    const tempo = performance.now() - inicio
 
-    fs.writeFileSync("videos.json", JSON.stringify(videosJson))
+    const tempo = performance.now() - inicio
     console.log(`${c} vídeos processados com sucesso em ${Math.round(tempo / 1000)}s`)
+
+    return await fechar()
 }
 
 f()
