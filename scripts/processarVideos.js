@@ -43,8 +43,7 @@ const f = async () => {
 
     await bd.conectar()
     if (!await bd.estaConectado()) {
-        console.log("[BD] Não foi possível conectar ao banco de dados")
-        return await fechar()
+        return console.log("[BD] Não foi possível conectar ao banco de dados")
     }
 
     if (!fs.existsSync("./videos/")) {

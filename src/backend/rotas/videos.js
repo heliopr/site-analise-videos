@@ -1,10 +1,11 @@
 const { Router } = require("express")
 const bodyParser = require("body-parser")
+const fs = require("fs")
 const bd = require("../bd")
 const path = require("path")
 const { tentar, tentarAsync } = require("../util/tentar")
 
-const videosJson = require("../../../videos.json")
+const videos = fs.readdirSync("./videos/")
 
 const router = Router()
 
@@ -23,6 +24,10 @@ function validarMarcacoes(marcacoes) {
             const frame = marcacao["frame"]
             if (typeof frame != "number") {
                 return `'frame' da marcação ${i} deve ser um número`
+            }
+
+            if (i > 0 && marcacoes[i-1]["frame"] >= frame) {
+                return `'frame' da marcação ${i} possui valor menor ou igual ao anterior`
             }
 
             const contemInterprete = marcacao["contemInterprete"]
@@ -53,51 +58,56 @@ function validarMarcacoes(marcacoes) {
 
 
 router.get("/videos", tentar((req, res) => {
-    res.status(200).json({ sucesso: true, videos: Object.keys(videosJson)})
+    res.status(200).json({ sucesso: true, videos: videos})
 }))
 
-router.get("/videos/:video", tentar((req, res) => {
+router.get("/videos/:video", tentarAsync(async (req, res) => {
     const video = req.params["video"]
-    if (videosJson[video] == undefined) {
+
+    const videoInfo = await bd.videosCollection.findOne({nome:video})
+
+    if (!videoInfo || !videos.includes(video)) {
         return res.status(400).json({ sucesso: false, mensagem: "Vídeo não encontrado" })
     }
 
-    res.status(200).json({ sucesso: true, video: videosJson[video] })
+    videoInfo["_id"] = undefined
+    videoInfo["marcacoes"] = undefined
+
+    res.status(200).json({ sucesso: true, video: videoInfo })
 }))
 
 router.get("/videos/:video/arquivo", tentar((req, res) => {
     const video = req.params["video"]
-    if (videosJson[video] == undefined) {
+
+    if (!videos.includes(video)) {
         return res.status(400).json({ sucesso: false, mensagem: "Vídeo não encontrado" })
     }
 
     res.status(200).sendFile(path.join(__dirname, "../../../videos/", video))
 }))
 
+
+
+
 router.get("/videos/:video/marcacoes", tentarAsync(async (req, res) => {
     const video = req.params["video"]
-    if (videosJson[video] == undefined) {
+
+    const videoInfo = await bd.videosCollection.findOne({nome: video})
+
+    if (!videoInfo || !videos.includes(video)) {
         return res.status(400).json({ sucesso: false, mensagem: "Vídeo não encontrado" })
     }
 
-    if (!await bd.estaConectado()) {
-        return res.status(400).json({ sucesso: false, mensagem: "Banco de dados não está conectado" })
-    }
-
-    const marcacoes = await bd.marcacoes.findOne({ nome: video })
-    if (marcacoes) {
-        res.status(200).json({ sucesso: true, marcacoes: marcacoes["marcacoes"] || [] })
-    }
-    else {
-        res.status(200).json({ sucesso: true, marcacoes: null })
-    }
+    res.status(200).json({ sucesso: true, marcacoes: videoInfo["marcacoes"] })
 }))
 
 router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (req, res) => {
     const video = req.params["video"]
     const marcacoes = req.body["marcacoes"]
 
-    if (videosJson[video] == undefined) {
+    const videoInfo = await bd.videosCollection.findOne({nome: video})
+
+    if (!videoInfo || !videos.includes(video)) {
         return res.status(400).json({ sucesso: false, mensagem: "Vídeo não encontrado" })
     }
 
@@ -106,14 +116,17 @@ router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (re
         return res.status(400).json({ sucesso: false, mensagem: mensagem })
     }
 
-    if (await bd.marcacoes.findOne({ nome: video }) != null) {
-        return res.status(400).json({ sucesso: false, mensagem: "Marcações já existem para este vídeo" })
+    
+    const r = await bd.videosCollection.updateOne({nome: video}, {$set: {marcacoes: marcacoes}})
+    if (!r || !r.acknowledged) {
+        res.status(400).json({sucesso: false, mensagem: "Não foi possível alterar as marcações no banco de dados"})
+        return
     }
 
-    await bd.marcacoes.insertOne({ nome: video, marcacoes: marcacoes })
     res.status(200).json({ sucesso: true })
 }))
 
+/* não é muito necessário já que agora as marcações estão na mesma collection
 router.put("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (req, res) => {
     const video = req.params["video"]
     const marcacoes = req.body["marcacoes"]
@@ -133,6 +146,6 @@ router.put("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (req
 
     await bd.marcacoes.updateOne({ nome: video }, { $set: { marcacoes: marcacoes } })
     res.status(200).json({ sucesso: true })
-}))
+}))*/
 
 module.exports = router

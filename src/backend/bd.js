@@ -8,7 +8,9 @@ bd.conectar = async () => {
     //console.log(url)
 
     console.log(`[BD] Criando cliente de conexão para '${url}'`)
-    bd.cliente = new mongodb.MongoClient(url)
+    bd.cliente = new mongodb.MongoClient(url, {
+        serverSelectionTimeoutMS: 3000
+    })
 
     console.log("[BD] Conectando...")
     await bd.cliente.connect()
@@ -23,7 +25,7 @@ bd.estaConectado = async () => {
     try {
         if (!bd.cliente) return false
 
-        let res = await bd.cliente.db().admin().ping()
+        let res = await bd.bd.command({ ping: 1 })
 
         return res != undefined && res.ok != undefined && res.ok === 1
     }
@@ -33,6 +35,8 @@ bd.estaConectado = async () => {
 }
 
 bd.encerrarConexao = async () => {
+    if (!bd.cliente) return
+
     console.log("[BD] Fechando conexão")
     await bd.cliente.close()
     console.log("[BD] Conexão fechada com sucesso")
