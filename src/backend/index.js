@@ -1,9 +1,11 @@
 require('dotenv').config()
 const express = require("express")
 const bd = require("./bd")
+const path = require("path")
 const fs = require("fs")
 
 const config = require("../../config.json")
+const { dirname } = require('path')
 
 const app = express()
 let servidor
@@ -58,6 +60,7 @@ const f = async () => {
     }
 
     app.use(require("./rotas/videos"))
+    app.use("/", express.static(path.join(__dirname, "../frontend")))
 
     servidor = app.listen(config.porta, () => {
         console.log(`Servidor aberto na porta ${config.porta}`)

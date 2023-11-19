@@ -105,7 +105,7 @@ Resposta:
 ```
 
 ## POST /videos/{video}/marcacoes
-Serve para criar as marcações de um vídeo (NÃO FUNCIONA CASO O VÍDEO JÁ TENHA MARCAÇÕES NO BANCO DE DADOS). Exemplo:
+Serve para criar as marcações de um vídeo. Exemplo:
 
 ```POST /videos/60fps.mp4/marcacoes```
 
@@ -128,32 +128,6 @@ Requisição:
             "contemInterprete": true,
             "pos1": [10, 10],
             "pos2": [100, 100]
-        }
-    ]
-}
-```
-
-Resposta:
-```json
-{
-    "sucesso": true
-}
-```
-
-## PUT /videos/{video}/marcacoes
-Serve para atualizar as marcações de um vídeo (NÃO FUNCIONA CASO O VÍDEO NÃO TENHA MARCAÇÕES NO BANCO DE DADOS). Exemplo:
-
-```PUT /videos/60fps.mp4/marcacoes```
-
-Requisição:
-```json
-{
-    "marcacoes": [
-        {
-            "frame": 10,
-            "contemInterprete": true,
-            "pos1": [10, 10],
-            "pos2": [15, 15]
         }
     ]
 }

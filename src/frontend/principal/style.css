@@ -1,37 +1,115 @@
-#LogoIFPR {
+#barra-superior {
+    position: absolute;
+
+    width: 98%;
+    height: 85px;
+
+    left: 1%;
+    top: 1%;
+
     border: 1px solid #ccc;
     box-shadow: 3px 3px 5px #888888;
-    padding: 20px;
 }
 
-#div1 {
-    float: left;
-    width: 48.9%;
-    height: 900px;
-    border: 1px solid #ccc;
-    box-shadow: 3px 3px 5px #888888;
-    padding: 10px;
+#logo-ifpr {
+    position: relative;
+
+    height: 80%;
+    width: auto;
+
+    top: 10%;
+    left: 2%;
 }
 
-#div2 {
-    float: right;
-    width: 48.6%;
-    height: 900px; 
+
+#videos {
+    position: absolute;
+
+    width: 40%;
+    height: 84%;
+
+    left: 1%;
+    top: calc(1% + 130px);
+
     border: 1px solid #ccc;
-    box-shadow: 3px 3px 5px #888888;
-    padding: 10px;
+    box-shadow: 0px 0px 5px #888888;
 }
 
-#titulo {
-    border: 1px solid #ccc;
-    box-shadow: 3px 3px 5px #888888;
+#videos #titulo {
+    font-size: 250%;
+
+    margin-top: 15px;
+    margin-bottom: 15px;
     padding: 10px;
+    padding-left: 20px;
 }
-#btn {
-    float: right;
-    width: 100px;
-    height: 50px;
-    background-color: green;
-    margin-top: -59px;
-    margin-left: 90px;
+
+#videos #lista-videos {
+    width: calc(100% - 30px);
+    height: calc(100% - 120px);
+
+    overflow-y: scroll;
+
+    padding-left: 20px;
+}
+
+#lista-videos .video {
+    position: relative;
+    width: 98%;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    list-style-type: none;
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 1px #888888;
+}
+
+.video .video-titulo {
+    position: relative;
+    width: 70%;
+
+    margin: 0;
+    padding: 8px;
+
+    font-size: 125%;
+}
+
+.video .status {
+    position: absolute;
+
+    height: calc(100% - 16px);
+    width: calc(29% - 24px);
+
+    top: 0;
+    right: 0;
+
+    margin: 0;
+    padding: 8px;
+
+    font-size: 125%;
+    text-align: right;
+}
+
+
+#painel-video {
+    position: absolute;
+
+    width: 55%;
+    height: 84%;
+
+    right: 2%;
+    top: calc(1% + 130px);
+
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 5px #888888;
+}
+
+#painel-video #titulo {
+    font-size: 250%;
+
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+    padding-left: 20px;
 }
