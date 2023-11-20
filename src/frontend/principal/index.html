@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Principal</title>
+
+    <script src="./index.js" defer></script>
 </head>
 
 <body>
@@ -15,19 +17,19 @@
     <div id="videos">
         <h1 id="titulo">Vídeos</h1>
         <ul id="lista-videos">
-            <li class="video">
-                <p class="video-titulo">Gravação 129-19374_1082_11.mp4</p>
-                <p class="status">status</p>
-            </li>
-            <li class="video">
-                <p class="video-titulo">60fps.mp4</p>
-                <p class="status">status</p>
-            </li>
         </ul>
     </div>
 
-    <div id="painel-video">
-        <h1 id="titulo">Painel</h1>
+    <div id="painel-video" style="visibility: hidden;">
+        <h1 id="titulo">Título do Vídeo</h1>
+        <div id="informacoes">
+            <p id="duracao">Duração: 0h 0h 0s</p>
+            <p id="frames">Frames: 0</p>
+            <p id="tamanho">Tamanho: 0</p>
+            <p id="marcado">Marcado: Não</p>
+            <button id="editar-marcacoes">Editar Marcações</button>
+            <button id="fechar">Fechar</button>
+        </div>
     </div>
 </body>
 </html>

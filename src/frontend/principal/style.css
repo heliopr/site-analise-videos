@@ -25,8 +25,8 @@
 #videos {
     position: absolute;
 
-    width: 40%;
-    height: 84%;
+    width: 50%;
+    height: calc(100% - (3% + 130px));
 
     left: 1%;
     top: calc(1% + 130px);
@@ -41,10 +41,10 @@
     margin-top: 15px;
     margin-bottom: 15px;
     padding: 10px;
-    padding-left: 20px;
+    padding-left: 30px;
 }
 
-#videos #lista-videos {
+#lista-videos {
     width: calc(100% - 30px);
     height: calc(100% - 120px);
 
@@ -53,7 +53,7 @@
     padding-left: 20px;
 }
 
-#lista-videos .video {
+.video {
     position: relative;
     width: 98%;
 
@@ -63,6 +63,12 @@
     list-style-type: none;
     border: 1px solid #ccc;
     box-shadow: 1px 1px 1px #888888;
+
+    cursor: pointer;
+}
+
+.video:hover {
+    background-color: #f1f1f1;
 }
 
 .video .video-titulo {
@@ -95,21 +101,70 @@
 #painel-video {
     position: absolute;
 
-    width: 55%;
-    height: 84%;
+    width: 45%;
+    height: auto;
 
-    right: 2%;
+    right: 1%;
     top: calc(1% + 130px);
 
     border: 1px solid #ccc;
     box-shadow: 0px 0px 5px #888888;
 }
 
-#painel-video #titulo {
-    font-size: 250%;
+#titulo {
+    font-size: 200%;
 
     margin-top: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
     padding: 10px;
-    padding-left: 20px;
+    padding-left: 30px;
+}
+
+#informacoes {
+    padding-left: 30px;
+}
+
+#informacoes p {
+    font-size: 150%;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+#editar-marcacoes {
+    font-size: 175%;
+
+    margin-top: 50px;
+    margin-bottom: 30px;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #2e7d32;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
+
+#editar-marcacoes:hover {
+    background-color: #17651b;
+}
+
+#fechar {
+    font-size: 175%;
+
+    margin-top: 50px;
+    margin-bottom: 30px;
+    margin-left: 30px;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #c62828;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
+
+#fechar:hover {
+    background-color: #9e2020;
 }

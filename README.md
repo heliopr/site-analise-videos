@@ -33,7 +33,7 @@ Em geral as respostas de uma requisição são um objeto JSON, contendo sempre u
 ```
 
 ## GET /videos
-Retorna um objeto JSON com uma lista que contém os nomes de todos os vídeos. Exemplo:
+Retorna um objeto JSON com uma lista que contém os nomes de todos os vídeos. Exemplo:<br>
 ```GET /videos```
 
 ```json
@@ -48,7 +48,7 @@ Retorna um objeto JSON com uma lista que contém os nomes de todos os vídeos. E
 ```
 
 ## GET /videos/{video}<br>
-Retorna informações sobre o vídeo. Exemplo:
+Retorna informações sobre o vídeo. Exemplo:<br>
 ```GET /videos/60fps.mp4```
 
 Resposta:
@@ -67,7 +67,7 @@ Resposta:
 ```
 
 ## GET /videos/{video}/arquivo
-Retorna o arquivo do vídeo, só retorna um objeto JSON em caso de erro (status 400). Exemplo:
+Retorna o arquivo do vídeo, só retorna um objeto JSON em caso de erro (status 400). Exemplo:<br>
 ```GET /videos/60fps.mp4/arquivo```
 
 Retorno: 
@@ -76,7 +76,7 @@ Retorno:
 ---
 
 ## GET /videos/{video}/marcacoes
-Retorna as marcações associadas ao vídeo. Exemplo:
+Retorna as marcações associadas ao vídeo. Exemplo:<br>
 ```GET /videos/60fps.mp4/marcacoes```
 
 Resposta:
@@ -105,7 +105,7 @@ Resposta:
 ```
 
 ## POST /videos/{video}/marcacoes
-Serve para criar as marcações de um vídeo. Exemplo:
+Serve para criar as marcações de um vídeo. Exemplo:<br>
 
 ```POST /videos/60fps.mp4/marcacoes```
 
