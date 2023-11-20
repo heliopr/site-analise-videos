@@ -89,6 +89,7 @@ const f = async () => {
             bd.videosCollection.insertOne({
                 nome: videoArquivo,
                 fps: parseFloat(frameRate),
+                marcado: false,
                 duracaoOriginal: processarMetadata["streams"][0]["duration"],
                 duracao: processadoMetadata["streams"][0]["duration"],
                 tamanho: processadoMetadata["format"]["size"],

@@ -44,7 +44,7 @@ function validarMarcacoes(marcacoes) {
             }
             else {
                 if (pos1 != undefined || pos2 != undefined) {
-                    return `Nenhuma das posições da marcação ${i} devem estar presentes já que contemInterprete é false`
+                    return `Nenhuma das posições da marcação ${i} devem estar presentes já que 'contemInterprete' é false`
                 }
             }
         }
@@ -57,8 +57,15 @@ function validarMarcacoes(marcacoes) {
 }
 
 
-router.get("/videos", tentar((req, res) => {
-    res.status(200).json({ sucesso: true, videos: videos})
+router.get("/videos", tentarAsync(async (req, res) => {
+    const videosBd = await bd.videosCollection.find({}).toArray()
+    const videosRes = []
+
+    for (const video of videosBd) {
+        videosRes.push({nome: video.nome, duracaoOriginal: video.duracaoOriginal, marcado: video.marcado})
+    }
+
+    res.status(200).json({ sucesso: true, videos: videosRes})
 }))
 
 router.get("/videos/:video", tentarAsync(async (req, res) => {
@@ -118,15 +125,12 @@ router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (re
 
     
     const r = await bd.videosCollection.updateOne({nome: video}, {$set: {marcacoes: marcacoes}})
-    if (!r || !r.acknowledged) {
-        res.status(400).json({sucesso: false, mensagem: "Não foi possível alterar as marcações no banco de dados"})
-        return
-    }
 
     res.status(200).json({ sucesso: true })
 }))
 
 /* não é muito necessário já que agora as marcações estão na mesma collection
+
 router.put("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (req, res) => {
     const video = req.params["video"]
     const marcacoes = req.body["marcacoes"]
