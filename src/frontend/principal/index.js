@@ -1,4 +1,5 @@
 const videos = document.getElementById("videos")
+const videosTitulo = videos.querySelector("#titulo")
 const listaVideos = document.getElementById("lista-videos")
 
 const painelVideo = document.getElementById("painel-video")
@@ -110,7 +111,7 @@ async function atualizarPainel(video) {
     tituloVideo.textContent = video
     marcadoVideo.textContent = `Marcado: ${info.marcado ? "Sim" : "Não"}`
     framesVideo.textContent = `Frames: ${info.frames}`
-    duracaoVideo.textContent = `Duração: ${info.duracaoOriginal}`
+    duracaoVideo.textContent = `Duração: ${formatarDuracao(info.duracaoOriginal)}`
     tamanhoVideo.textContent = `Tamanho da Prévia: ${formatarTamanho(info.tamanho, 1024)} (${formatarTamanho(info.tamanho, 1000)})`
 }
 
@@ -140,6 +141,8 @@ fechar.addEventListener("click", () => {
 
 
 const f = async () => {
+    videosTitulo.textContent = "Vídeos - CARREGANDO..."
+
     let resVideos
     try {
         const r = await fetch("/videos/", {
@@ -149,15 +152,19 @@ const f = async () => {
         resVideos = await r.json()
     }
     catch (e) {
+        videosTitulo.textContent = "Vídeos - ERRO"
         console.log(e)
-        alert("Ocorreu um erro ao requisitar a lista dos vídeos aos servidor, cheque o console")
+        alert("Ocorreu um erro ao requisitar a lista dos vídeos aos servidor, cheque o console ou tente recarregar a página")
         return
     }
 
     if (!resVideos.sucesso) {
-        alert("Um erro desconhecido ocorreu ao tentar requisitar a lista dos vídeos")
+        videosTitulo.textContent = "Vídeos - ERRO"
+        alert("Um erro desconhecido ocorreu ao tentar requisitar a lista dos vídeos, tente recarregar a página")
         return
     }
+
+    videosTitulo.textContent = "Vídeos"
 
     for (const video of resVideos.videos) {
         const li = criarVideo(video.nome, formatarDuracao(video.duracaoOriginal), video.marcado)
@@ -170,6 +177,18 @@ const f = async () => {
             }
             else {
                 desselecionarVideo()
+            }
+        })
+
+        li.addEventListener("mouseenter", () => {
+            if (videoSelecionado != li) {
+                li.style.backgroundColor = "#f1f1f1"
+            }
+        })
+
+        li.addEventListener("mouseleave", () => {
+            if (videoSelecionado != li) {
+                li.style.backgroundColor = "#ffffff"
             }
         })
     }

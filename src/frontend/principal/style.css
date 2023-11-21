@@ -2,7 +2,7 @@
     position: absolute;
 
     width: 98%;
-    height: 85px;
+    height: 70px;
 
     left: 1%;
     top: 1%;
@@ -26,10 +26,10 @@
     position: absolute;
 
     width: 50%;
-    height: calc(100% - (3% + 130px));
+    height: calc(100% - (3% + 100px));
 
     left: 1%;
-    top: calc(1% + 130px);
+    top: calc(1% + 100px);
 
     border: 1px solid #ccc;
     box-shadow: 0px 0px 5px #888888;
@@ -46,7 +46,7 @@
 
 #lista-videos {
     width: calc(100% - 30px);
-    height: calc(100% - 120px);
+    height: calc(100% - 185px);
 
     overflow-y: scroll;
 
@@ -65,10 +65,6 @@
     box-shadow: 1px 1px 1px #888888;
 
     cursor: pointer;
-}
-
-.video:hover {
-    background-color: #f1f1f1;
 }
 
 .video .video-titulo {
@@ -98,6 +94,26 @@
 }
 
 
+#filtros {
+    margin-bottom: 30px;
+    padding-left: 20px;
+
+    font-size: 150%;
+}
+
+#filtro-somente {
+    font-size: 80%;
+}
+
+#aplicar-filtros {
+    font-size: 70%;
+}
+
+#limpar {
+    font-size: 70%;
+}
+
+
 #painel-video {
     position: absolute;
 
@@ -105,7 +121,7 @@
     height: auto;
 
     right: 1%;
-    top: calc(1% + 130px);
+    top: calc(1% + 100px);
 
     border: 1px solid #ccc;
     box-shadow: 0px 0px 5px #888888;

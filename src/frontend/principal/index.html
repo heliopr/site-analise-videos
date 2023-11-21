@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Principal</title>
-
-    <script src="./index.js" defer></script>
 </head>
 
 <body>
@@ -16,6 +14,18 @@
 
     <div id="videos">
         <h1 id="titulo">Vídeos</h1>
+        <div id="filtros">
+            <label id="somente-label" for="somente">Somente</label>
+            <select id="filtro-somente" name="somente">
+                <option value="ambos">Ambos</option>
+                <option value="marcado">Marcado</option>
+                <option value="nao-marcado">Não Marcado</option>
+            </select>
+
+            <button id="aplicar-filtros">Aplicar Filtros</button>
+            <button id="limpar">Limpar</button>
+        </div>
+        <hr class="solid">
         <ul id="lista-videos">
         </ul>
     </div>
@@ -32,4 +42,7 @@
         </div>
     </div>
 </body>
+
+
+<script src="./index.js" defer></script>
 </html>
