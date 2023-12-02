@@ -1,17 +1,24 @@
-const videos = document.getElementById("videos")
-const videosTitulo = videos.querySelector("#titulo")
-const listaVideos = document.getElementById("lista-videos")
+const elementos = {
+    videos: document.getElementById("videos"),
+    videosTitulo: document.querySelector("#videos #titulo"),
+    listaVideos: document.getElementById("lista-videos"),
+    filtros: document.querySelector("#filtros"),
+    limparFiltros: document.querySelector("#filtros #limpar-filtros"),
+    aplicarFiltros: document.querySelector("#filtros #aplicar-filtros"),
+    filtroSomente: document.querySelector("#filtros #filtro-somente"),
 
-const painelVideo = document.getElementById("painel-video")
-const tituloVideo = painelVideo.querySelector("#titulo")
-const informacoes = document.getElementById("informacoes")
-const editarMarcacoes = document.getElementById("editar-marcacoes")
-const fechar = document.getElementById("fechar")
-const duracaoVideo = informacoes.querySelector("#duracao")
-const framesVideo = informacoes.querySelector("#frames")
-const tamanhoVideo = informacoes.querySelector("#tamanho")
-const marcadoVideo = informacoes.querySelector("#marcado")
+    painelVideo: document.getElementById("painel-video"),
+    tituloVideo: document.querySelector("#painel-video #titulo"),
+    informacoes: document.getElementById("informacoes"),
+    editarMarcacoes: document.getElementById("editar-marcacoes"),
+    fechar: document.getElementById("fechar"),
+    duracaoVideo: document.querySelector("#informacoes #duracao"),
+    framesVideo: document.querySelector("#informacoes #frames"),
+    tamanhoVideo: document.querySelector("#informacoes #tamanho"),
+    marcadoVideo: document.querySelector("#informacoes #marcado")
+}
 
+const videosLista = []
 let videoSelecionado = null
 let painelCarregado = true
 
@@ -35,9 +42,19 @@ function criarVideo(nome, duracao, marcado) {
 
     li.appendChild(titulo)
     li.appendChild(status)
-
-    listaVideos.appendChild(li)
+    elementos.listaVideos.appendChild(li)
     return li
+}
+
+function filtrarVideos(nome, status) {
+    for (const video of videosLista) {
+        if ((!nome || video.nome.startsWith(nome)) && ((status==undefined || status==null) || video.info.marcado == status)) {
+            video.e.style.display = "block"
+        }
+        else {
+            video.e.style.display = "none"
+        }
+    }
 }
 
 function formatarTamanho(bytes, k) {
@@ -61,7 +78,7 @@ function formatarDuracao(duracao) {
     duracao -= m*60
     let s = Math.floor(duracao)
 
-    // necessário para não ocorrer "0h 0m 30s", só "30s" já é o suficiente
+    // para retornar "30s" ao invés de "0h 0m 30s"
     let formatado
     if (h > 0) formatado = `${h}h ${m}m ${s}s`
     else if (m > 0) formatado = `${m}m ${s}s`
@@ -91,34 +108,34 @@ async function getInfoVideo(video) {
 async function atualizarPainel(video) {
     painelCarregado = false
 
-    tituloVideo.textContent = "Carregando..."
-    marcadoVideo.textContent = "Carregando..."
-    framesVideo.textContent = "Carregando..."
-    duracaoVideo.textContent = "Carregando..."
-    tamanhoVideo.textContent = "Carregando..."
+    elementos.tituloVideo.textContent = "Carregando..."
+    elementos.marcadoVideo.textContent = "Carregando..."
+    elementos.framesVideo.textContent = "Carregando..."
+    elementos.duracaoVideo.textContent = "Carregando..."
+    elementos.tamanhoVideo.textContent = "Carregando..."
 
     const info = await getInfoVideo(video)
     painelCarregado = true
     if (!info) {
-        tituloVideo.textContent = "Erro"
-        marcadoVideo.textContent = "Erro"
-        framesVideo.textContent = "Erro"
-        duracaoVideo.textContent = "Erro"
-        tamanhoVideo.textContent = "Erro"
+        elementos.tituloVideo.textContent = "Erro"
+        elementos.marcadoVideo.textContent = "Erro"
+        elementos.framesVideo.textContent = "Erro"
+        elementos.duracaoVideo.textContent = "Erro"
+        elementos.tamanhoVideo.textContent = "Erro"
         return
     }
 
-    tituloVideo.textContent = video
-    marcadoVideo.textContent = `Marcado: ${info.marcado ? "Sim" : "Não"}`
-    framesVideo.textContent = `Frames: ${info.frames}`
-    duracaoVideo.textContent = `Duração: ${formatarDuracao(info.duracaoOriginal)}`
-    tamanhoVideo.textContent = `Tamanho da Prévia: ${formatarTamanho(info.tamanho, 1024)} (${formatarTamanho(info.tamanho, 1000)})`
+    elementos.tituloVideo.textContent = video
+    elementos.marcadoVideo.textContent = `Marcado: ${info.marcado ? "Sim" : "Não"}`
+    elementos.framesVideo.textContent = `Frames: ${info.frames}`
+    elementos.duracaoVideo.textContent = `Duração: ${formatarDuracao(info.duracaoOriginal)}`
+    elementos.tamanhoVideo.textContent = `Tamanho da Prévia: ${formatarTamanho(info.tamanho, 1024)} (${formatarTamanho(info.tamanho, 1000)})`
 }
 
 function desselecionarVideo() {
     if (!videoSelecionado) return
 
-    painelVideo.style.visibility = "hidden"
+    elementos.painelVideo.style.visibility = "hidden"
 
     videoSelecionado.style.backgroundColor = "#ffffff"
     videoSelecionado = null
@@ -128,20 +145,14 @@ function selecionarVideo(li, video) {
     videoSelecionado = li
     li.style.backgroundColor = "#e0e0e0"
 
-    painelVideo.style.visibility = "visible"
+    elementos.painelVideo.style.visibility = "visible"
     atualizarPainel(video)
 }
 
 
-fechar.addEventListener("click", () => {
-    if (videoSelecionado) {
-        desselecionarVideo()
-    }
-})
-
 
 const f = async () => {
-    videosTitulo.textContent = "Vídeos - CARREGANDO..."
+    elementos.videosTitulo.textContent = "Vídeos - CARREGANDO..."
 
     let resVideos
     try {
@@ -152,19 +163,19 @@ const f = async () => {
         resVideos = await r.json()
     }
     catch (e) {
-        videosTitulo.textContent = "Vídeos - ERRO"
+        elementos.videosTitulo.textContent = "Vídeos - ERRO"
         console.log(e)
         alert("Ocorreu um erro ao requisitar a lista dos vídeos aos servidor, cheque o console ou tente recarregar a página")
         return
     }
 
     if (!resVideos.sucesso) {
-        videosTitulo.textContent = "Vídeos - ERRO"
+        elementos.videosTitulo.textContent = "Vídeos - ERRO"
         alert("Um erro desconhecido ocorreu ao tentar requisitar a lista dos vídeos, tente recarregar a página")
         return
     }
 
-    videosTitulo.textContent = "Vídeos"
+    elementos.videosTitulo.textContent = "Vídeos"
 
     for (const video of resVideos.videos) {
         const li = criarVideo(video.nome, formatarDuracao(video.duracaoOriginal), video.marcado)
@@ -191,7 +202,34 @@ const f = async () => {
                 li.style.backgroundColor = "#ffffff"
             }
         })
+        videosLista.push({nome: video.nome, info: video, e: li})
     }
+
+    fechar.addEventListener("click", () => {
+        if (videoSelecionado) {
+            desselecionarVideo()
+        }
+    })
+
+
+
+    elementos.limparFiltros.addEventListener("click", () => {
+        elementos.filtroSomente.value = "ambos"
+        filtrarVideos()
+    })
+
+    elementos.aplicarFiltros.addEventListener("click", () => {
+        let status = null
+        console.log(elementos.filtroSomente.value)
+        if (elementos.filtroSomente.value == "nao-marcado") {
+            status = false
+        }
+        else if (elementos.filtroSomente.value == "marcado") {
+            status = true
+        }
+
+        filtrarVideos(null, status)
+    })
 }
 
 f()
