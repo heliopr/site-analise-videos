@@ -63,6 +63,11 @@ const f = async () => {
             continue
         }
 
+        if (fs.existsSync("./videos/"+videoArquivo)) {
+            console.log(`O vídeo '${videoArquivo}' já está na pasta 'videos'. PULANDO VÍDEO...`)
+            continue
+        }
+
         const processadoPath = `videos/${videoArquivo}`
         const processarPath = `processar/${videoArquivo}`
         console.log(`Processando vídeo '${videoArquivo}'`)
@@ -86,6 +91,8 @@ const f = async () => {
 
             const processadoMetadata = await pegarMetadata(processadoPath)
 
+            //console.log(processadoMetadata)
+
             bd.videosCollection.insertOne({
                 nome: videoArquivo,
                 fps: parseFloat(frameRate),
@@ -93,7 +100,8 @@ const f = async () => {
                 duracaoOriginal: processarMetadata["streams"][0]["duration"],
                 duracao: processadoMetadata["streams"][0]["duration"],
                 tamanho: processadoMetadata["format"]["size"],
-                frames: processadoMetadata["streams"][0]["nb_frames"]
+                frames: processadoMetadata["streams"][0]["nb_frames"],
+                resolucao: [processadoMetadata["streams"][0]["width"],processadoMetadata["streams"][0]["height"]]
             })
             console.log(`'${videoArquivo}' processado em ${(tempo / 1000).toFixed(2)}s (${tempo.toFixed(1)}ms)`)
             c += 1

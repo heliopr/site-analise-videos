@@ -83,7 +83,7 @@ router.get("/videos/:video", tentarAsync(async (req, res) => {
     res.status(200).json({ sucesso: true, video: videoInfo })
 }))
 
-router.get("/videos/:video/arquivo", tentar((req, res) => {
+router.get("/videos/:video/video", tentar((req, res) => {
     const video = req.params["video"]
 
     if (!videos.includes(video)) {

@@ -58,7 +58,7 @@ function filtrarVideos(nome, status) {
 }
 
 function formatarTamanho(bytes, k) {
-    const t = ["KB", "MB", "GB"]
+    const t = ["KB", "MB", "GB", "TB"]
     let c = `${bytes}B`
 
     for (let i = 0; i < t.length; i++) {
