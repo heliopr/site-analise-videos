@@ -5,23 +5,27 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <canvas id="canvas" ></canvas>
-        <video id="v" autoplay muted hidden> 
-            <source src="video.mp4" type="video/mp4" />
-        </video>
 
-            <button onclick="drawRectangle()" class="selecionar" id="selecionar">selecionar</button>
+
+    
+    <div class="player" id="player">
+        <div class="conteudo">
+            <canvas id="canvas"></canvas>
+            <video id="v" autoplay muted hidden> 
+                <source src="video.mp4" type="video/mp4" />
+            </video>
+    </div>
+        <div class="ferramentas">
             <button onclick="play()" class="play" id="play">play</button>
-        
-        
+            <input type="checkbox" id="selecionar">
+            <label for="selecionar">Selecionar</label>
+        </div>
+    </div>
+    
         
         <h1 id="frame"></h1>
         <h1 id="coords1"></h1>
         <h1 id="coords2"></h1>
     </body>
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/451/fabric.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
 </html>

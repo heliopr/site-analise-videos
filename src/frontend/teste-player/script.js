@@ -38,103 +38,109 @@ setInterval(() => {
 }, 100)
 
 
-
-/*
-$(document).ready(function() {
-    $("video").on("click", function(event) {
-        
-        var x = event.pageX - this.offsetLeft;
-        var y = event.pageY - this.offsetTop;
-        alert("X Coordinate: " + x + " Y Coordinate: " + y);
-        if (c){
-            coords1.textContent = "Coordenadas " + "x:" + x + " y:" + y
-            c = false
-            coords2.textContent = ""
-        }else{
-            coords2.textContent = "Coordenadas " + "x:" + x + " y:" + y
-            c = true
-        }
-        
-    });
-});*/
-
-
-
-// Código de teste, provavelmente vai ter que reescrever tudo a partir daqui 
 document.addEventListener('DOMContentLoaded', function() {
   requestAnimationFrame(drawImgeC);
+  
 });
 
-
-let p = true
 function play() {
     var video = document.querySelector("#v");
-    if(p){
-        video.play()
-        p = false
-    }else if(!p){
-        video.pause()
-        p = true
+    if(video.paused){
+        video.play();
+    } else {
+        video.pause();
     }
 }
 
+var pchange = 1;
+var canvas = document.querySelector("#canvas");
+var originalh = (window.innerHeight)*0.7;
 
 function drawImgeC() {
-  
+    
   var video = document.querySelector("#v");
   var canvas = document.querySelector("#canvas");
   var ctx = canvas.getContext('2d');
-  canvas.width = 1280;
-  canvas.height = 720;
+
+  var w = window.innerWidth-200;
+  var h = window.innerHeight;
+  var size = Math.min(w,h);
+  canvas.width = size*1.2;
+  canvas.height = size*0.7;
+  pchange = 1-((originalh - canvas.height) / originalh);
 
   
+  
+  ctx.fillStyle = 'rgba(255,255,0,0.5)';
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  setTimeout(drawImgeC, 0);
 
-  ctx.fillStyle = 'rgba(0,0,255,0.5)';
-  ctx.fillRect(sessionStorage.getItem("drawRectangleX"), sessionStorage.getItem("drawRectangleY"), sessionStorage.getItem("drawRectangleW"), sessionStorage.getItem("drawRectangleH"));
-  console.log(sessionStorage.getItem("drawRectangleX"),sessionStorage.getItem("drawRectangleY"), sessionStorage.getItem("drawRectangleW"), sessionStorage.getItem("drawRectangleH"));
+  drawSelectionRectangles();
+
+  requestAnimationFrame(drawImgeC);
   
 }
 
+function drawSelectionRectangles() {
+    var canvas = document.querySelector("#canvas");
+    var ctx = canvas.getContext('2d');
+  
+    var drawRectangleX = sessionStorage.getItem("drawRectangleX");
+    var drawRectangleY = sessionStorage.getItem("drawRectangleY");
+    var drawRectangleW = sessionStorage.getItem("drawRectangleW");
+    var drawRectangleH = sessionStorage.getItem("drawRectangleH");
+  
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+    ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+    ctx.drawImage(document.querySelector("#v"), 0, 0, canvas.width, canvas.height);
+ 
+    if (drawRectangleX !== null && drawRectangleY !== null && drawRectangleW !== null && drawRectangleH !== null) {
+        ctx.fillRect(drawRectangleX * pchange, drawRectangleY * pchange, drawRectangleW * pchange, drawRectangleH * pchange);
+    }
 
-function drawRectangle() {
-
-  video.pause()
-  p = true
-  var canvas = new fabric.Canvas('canvas', { selection: false });
-  var rect, isDown, origX, origY;
-
-  canvas.on('mouse:down', function (o) {
-    video.pause()
-    isDown = true;
-    var pointer = canvas.getPointer(o);
-    origX = pointer.x;
-    origY = pointer.y;
-    var pointer = canvas.getPointer(o);
-    rect = new fabric.Rect({
-      fill: 'rgba(255,0,0,0.5)',
-      transparentCorners: false
-    });
-    
-    sessionStorage.setItem("drawRectangleX", origX);
-    sessionStorage.setItem("drawRectangleY", origY);
-    sessionStorage.setItem("drawRectangleW", pointer.x - origX);
-    sessionStorage.setItem("drawRectangleH", pointer.y - origY);
-
-  });
-
-
-  canvas.on('mouse:move', function (o) {
-    if (!isDown) return;
-    var pointer = canvas.getPointer(o);
-    sessionStorage.setItem("drawRectangleW", pointer.x - origX);
-    sessionStorage.setItem("drawRectangleH", pointer.y - origY);
-  });
-
-
-  canvas.on('mouse:up', function (o) {
-    isDown = false;
-  });
-
+  
+    //console.log(drawRectangleX, drawRectangleY, drawRectangleW, drawRectangleH);
 }
+
+
+var selecionar = document.getElementById('selecionar');
+selecionar.addEventListener("change", (e) => {
+    if (e.currentTarget.checked) {
+        var canvas = document.querySelector("#canvas");
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseup', handleMouseUp);
+      } else {
+        var canvas = document.querySelector("#canvas");
+        canvas.removeEventListener('mousedown', handleMouseDown);
+        canvas.removeEventListener('mousemove', handleMouseMove);
+        canvas.removeEventListener('mouseup', handleMouseUp);
+      }
+    });
+    var isDrawing = false;
+    var startX, startY;
+    
+    function handleMouseDown(e) {
+      isDrawing = true;
+      startX = e.clientX - canvas.getBoundingClientRect().left;
+      startY = e.clientY - canvas.getBoundingClientRect().top;
+    }
+    
+    function handleMouseMove(e) {
+      if (!isDrawing) return;
+    
+      var canvas = document.querySelector("#canvas");
+      var endX = e.clientX - canvas.getBoundingClientRect().left;
+      var endY = e.clientY - canvas.getBoundingClientRect().top;
+    
+      sessionStorage.setItem("drawRectangleX", startX * (1/pchange));
+      sessionStorage.setItem("drawRectangleY", startY * (1/pchange));
+      sessionStorage.setItem("drawRectangleW", (endX - startX) * (1/pchange));
+      sessionStorage.setItem("drawRectangleH", (endY - startY) * (1/pchange));
+    
+      drawSelectionRectangles();
+    }
+    
+    function handleMouseUp() {
+      isDrawing = false;
+    }
