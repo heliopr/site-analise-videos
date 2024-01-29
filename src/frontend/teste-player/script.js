@@ -2,7 +2,7 @@ var video = document.querySelector("#v");
 let c = true
 let v = document.querySelector("#v")
 const frames = document.querySelector("#frame")
-const fps = 23.976
+const fps = 30
 
 document.addEventListener("keypress", (e) => {
     if (v.paused) {
@@ -48,13 +48,18 @@ function play() {
     }
 }
 
+function converter(f) {
+    if (f < 3) return f
+    return Math.round((f-2) * fps) - 2
+}
+
 var pchange = 1;
 var canvas = document.querySelector("#canvas");
 var originalh = (window.innerHeight)*0.7;
 
 function drawImgeC(now, meta) {
-
-    frame.textContent = "Frame " + (Math.round(meta.mediaTime  * fps))
+    const fr = (Math.round(meta.mediaTime  * fps))
+    frame.textContent = "Frame " + (fr+1) + " - " + (converter(fr)+1)
     
   var video = document.querySelector("#v");
   var canvas = document.querySelector("#canvas");

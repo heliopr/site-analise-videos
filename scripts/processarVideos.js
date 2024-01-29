@@ -75,7 +75,7 @@ const f = async () => {
         try {
             const processarMetadata = await pegarMetadata(processarPath)
             const avgFrameRate = processarMetadata["streams"][0]["avg_frame_rate"].split("/")
-            const frameRate = (parseInt(avgFrameRate[0])/parseInt(avgFrameRate[1])).toFixed(5)
+            const frameRate = (parseInt(avgFrameRate[0])/parseInt(avgFrameRate[1]))
             //console.log(frameRate)
 
             const inicio = performance.now()
