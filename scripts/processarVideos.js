@@ -87,7 +87,7 @@ const f = async () => {
                 "-an",
                 processadoPath
             ])
-            spawnSync("ffmpeg", [
+            /*spawnSync("ffmpeg", [
                 "-y",
                 "-i", processarPath,
                 "-an",
@@ -99,7 +99,7 @@ const f = async () => {
                 "-vf", `setpts=PTS/${frameRate}`,
                 "-an",
                 "teste1/out%d.png"
-            ])
+            ])*/
             const tempo = performance.now() - inicio
 
             const processadoMetadata = await pegarMetadata(processadoPath)
