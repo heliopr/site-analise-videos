@@ -2,7 +2,7 @@ var video = document.querySelector("#v");
 let c = true
 let v = document.querySelector("#v")
 const frames = document.querySelector("#frame")
-const fps = 30
+const fps = 23.976
 
 document.addEventListener("keypress", (e) => {
     if (v.paused) {
@@ -29,17 +29,13 @@ document.addEventListener("keypress", (e) => {
                 break
         }
 
-        v.currentTime += d * (1 / fps)
+        v.currentTime = v.currentTime + d * (1 / fps)
     }
 })
 
-setInterval(() => {
-    frame.textContent = "Frame " + Math.round(v.currentTime * 30)
-}, 100)
-
 
 document.addEventListener('DOMContentLoaded', function() {
-  requestAnimationFrame(drawImgeC);
+    video.requestVideoFrameCallback(drawImgeC);
   
 });
 
@@ -56,7 +52,9 @@ var pchange = 1;
 var canvas = document.querySelector("#canvas");
 var originalh = (window.innerHeight)*0.7;
 
-function drawImgeC() {
+function drawImgeC(now, meta) {
+
+    frame.textContent = "Frame " + (Math.round(meta.mediaTime  * fps))
     
   var video = document.querySelector("#v");
   var canvas = document.querySelector("#canvas");
@@ -76,7 +74,7 @@ function drawImgeC() {
 
   drawSelectionRectangles();
 
-  requestAnimationFrame(drawImgeC);
+  video.requestVideoFrameCallback(drawImgeC);
   
 }
 

@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="./script.js" defer></script>
         <link rel="stylesheet" href="./style.css">
     </head>
     <body>
-        <canvas id="canvas"></canvas>
-        <video id="video" autoplay muted hidden> 
-            <source src="video.mp4" type="video/mp4" />
-        </video>
+
+        <h1 id="aguarde" style="visibility: hidden;">AGUARDE... Reinicie a página se demorar mais que alguns segundos</h1>
+
+        <div id="conteudo" style="visibility: hidden;">
+            <div id="player">
+                <canvas id="canvas"></canvas>
+                <video id="video-player" autoplay muted hidden></video>
+            </div>
+        </div>
+
     </body>
+
+    <script src="./script.js" defer></script>
 </html>

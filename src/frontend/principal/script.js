@@ -20,6 +20,7 @@ const elementos = {
 
 const videosLista = []
 let videoSelecionado = null
+let videoSelecionadoNome = null
 let painelCarregado = true
 
 function criarVideo(nome, duracao, marcado) {
@@ -139,10 +140,12 @@ function desselecionarVideo() {
 
     videoSelecionado.style.backgroundColor = "#ffffff"
     videoSelecionado = null
+    videoSelecionadoNome = null
 }
 
 function selecionarVideo(li, video) {
     videoSelecionado = li
+    videoSelecionadoNome = video
     li.style.backgroundColor = "#e0e0e0"
 
     elementos.painelVideo.style.visibility = "visible"
@@ -205,13 +208,15 @@ const f = async () => {
         videosLista.push({nome: video.nome, info: video, e: li})
     }
 
-    fechar.addEventListener("click", () => {
+    elementos.fechar.addEventListener("click", () => {
         if (videoSelecionado) {
             desselecionarVideo()
         }
     })
 
-
+    elementos.editarMarcacoes.addEventListener("click", () => {
+        location.pathname = `/editar/${videoSelecionadoNome}`
+    })
 
     elementos.limparFiltros.addEventListener("click", () => {
         elementos.filtroSomente.value = "ambos"

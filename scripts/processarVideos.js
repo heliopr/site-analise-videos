@@ -75,7 +75,7 @@ const f = async () => {
         try {
             const processarMetadata = await pegarMetadata(processarPath)
             const avgFrameRate = processarMetadata["streams"][0]["avg_frame_rate"].split("/")
-            const frameRate = (parseInt(avgFrameRate[0])/parseInt(avgFrameRate[1])).toFixed(2)
+            const frameRate = (parseInt(avgFrameRate[0])/parseInt(avgFrameRate[1])).toFixed(5)
             //console.log(frameRate)
 
             const inicio = performance.now()
@@ -87,11 +87,26 @@ const f = async () => {
                 "-an",
                 processadoPath
             ])
+            spawnSync("ffmpeg", [
+                "-y",
+                "-i", processarPath,
+                "-an",
+                "teste2/out%d.png"
+            ])
+            spawnSync("ffmpeg", [
+                "-y",
+                "-i", processarPath,
+                "-vf", `setpts=PTS/${frameRate}`,
+                "-an",
+                "teste1/out%d.png"
+            ])
             const tempo = performance.now() - inicio
 
             const processadoMetadata = await pegarMetadata(processadoPath)
 
             //console.log(processadoMetadata)
+
+            console.log(processarMetadata)
 
             bd.videosCollection.insertOne({
                 nome: videoArquivo,
@@ -101,6 +116,7 @@ const f = async () => {
                 duracao: processadoMetadata["streams"][0]["duration"],
                 tamanho: processadoMetadata["format"]["size"],
                 frames: processadoMetadata["streams"][0]["nb_frames"],
+                //originalFrames: processarMetadata["streams"][0]["nb_frames"],
                 resolucao: [processadoMetadata["streams"][0]["width"],processadoMetadata["streams"][0]["height"]]
             })
             console.log(`'${videoArquivo}' processado em ${(tempo / 1000).toFixed(2)}s (${tempo.toFixed(1)}ms)`)
