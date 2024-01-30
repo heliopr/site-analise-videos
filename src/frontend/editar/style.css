@@ -1,0 +1,44 @@
+body {
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+#player {
+    position: absolute;
+    width: 46%;
+}
+
+#canvas {
+    width: 100%;
+    height: auto;
+}
+
+#barra {
+    width: 100%;
+    height: 8px;
+
+    margin-top: 15px;
+
+    background-color: rgb(167, 167, 167);
+}
+
+#posicao-cursor {
+    position: absolute;
+    visibility: visible;
+
+    width: 5px;
+    height: 20px;
+
+    background-color: rgb(65, 65, 65);
+}
+
+
+#painel {
+    position: absolute;
+    width: 45%;
+    height: 600px;
+
+    right: 2%;
+
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 5px #888888;
+}

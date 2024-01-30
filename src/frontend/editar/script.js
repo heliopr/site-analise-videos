@@ -1,12 +1,18 @@
 const elementos = {
     aguarde: document.querySelector("#aguarde"),
     conteudo: document.querySelector("#conteudo"),
+    barra: document.querySelector("#barra"),
+    posicaoCursor: document.querySelector("#posicao-cursor"),
 
+    player: document.querySelector("#player"),
     canvas: document.querySelector("#player #canvas"),
     videoPlayer: document.querySelector("#video-player")
 }
 
 const context = elementos.canvas.getContext('2d')
+
+let frameAtual = 0
+let infoVideo = null
 
 function aguardarEvento(item, evento) {
     return new Promise((resolve) => {
@@ -16,7 +22,16 @@ function aguardarEvento(item, evento) {
         }
         item.addEventListener(evento, l)
     })
-  }
+}
+
+function renderizarCursor() {
+    const barraRect = elementos.barra.getBoundingClientRect()
+    const playerRect = elementos.player.getBoundingClientRect()
+    const posy = (barraRect.y+(barraRect.height/2)-(elementos.posicaoCursor.clientHeight/2)-playerRect.top)
+    const posx = ((frameAtual/infoVideo["video"]["frames"])*barraRect.width) - (elementos.posicaoCursor.clientWidth/2)
+    elementos.posicaoCursor.style.top = posy+"px"
+    elementos.posicaoCursor.style.left = posx+"px"
+}
 
 function renderizarCanva() {
     const w = window.innerWidth-200
@@ -28,8 +43,12 @@ function renderizarCanva() {
     
     context.fillStyle = 'rgba(255,255,0,0.5)'
     context.drawImage(elementos.videoPlayer, 0, 0, canvas.width, canvas.height)
-  
-    requestAnimationFrame(renderizarCanva)
+}
+
+function renderizar() {
+    renderizarCanva()
+    if (infoVideo) renderizarCursor()
+    requestAnimationFrame(renderizar)
 }
 
 const f = async () => {
@@ -37,19 +56,18 @@ const f = async () => {
 
     if (document.readyState === "loading") {
         document.addEventListener('DOMContentLoaded', function() {
-            requestAnimationFrame(renderizarCanva)
+            requestAnimationFrame(renderizar)
         })
     }
     else {
         new Promise((resolve) => {
-            requestAnimationFrame(renderizarCanva)
+            requestAnimationFrame(renderizar)
             resolve()
         })
     }
 
     const videoNome = location.pathname.substring(8)
 
-    let infoVideo
     try {
         const r = await fetch(`/videos/${videoNome}/`, {
             method: "GET",
@@ -64,7 +82,7 @@ const f = async () => {
         return
     }
 
-    if (!infoVideo.sucesso) {
+    if (!infoVideo || !infoVideo.sucesso) {
         elementos.aguarde.textContent = "ERRO"
         alert("Um erro ocorreu ao tentar requisitar informações sobre o vídeo, tente recarregar a página")
         return
