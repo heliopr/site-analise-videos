@@ -3,8 +3,8 @@ body {
 }
 
 #player {
-    position: absolute;
     width: 46%;
+    top: 5%;
 }
 
 #canvas {
@@ -22,14 +22,44 @@ body {
 }
 
 #posicao-cursor {
-    position: absolute;
+    position: relative;
     visibility: visible;
+    top: -14px;
 
     width: 5px;
     height: 20px;
 
     background-color: rgb(65, 65, 65);
 }
+
+#play {
+    position: relative;
+    left: calc(50% - 35px);
+    top: 20px;
+
+    width: 70px;
+    height: 30px;
+
+    font-size: 110%;
+}
+
+#velocidade {
+    position: relative;
+    left: calc(50% - 35px);
+    top: 20px;
+
+    width: 50px;
+    height: 30px;
+
+    font-size: 110%;
+}
+
+#frames {
+    position: relative;
+    top: 30px;
+}
+
+
 
 
 #painel {
@@ -38,7 +68,22 @@ body {
     height: 600px;
 
     right: 2%;
+    top: 5%;
 
     border: 1px solid #ccc;
     box-shadow: 3px 3px 5px #888888;
+}
+
+#titulo-video {
+    padding-left: 3%;
+}
+
+#frame {
+    padding-left: 3%;
+    font-size: 160%;
+}
+
+#frame-original {
+    padding-left: 3%;
+    font-size: 160%;
 }
