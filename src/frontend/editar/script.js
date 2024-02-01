@@ -218,22 +218,7 @@ const f = async () => {
 
     console.log(infoVideo)
 
-    marcacoes = infoVideo["video"]["marcado"] ? infoVideo["video"]["marcacoes"] : [{
-        "frame": 0,
-        "contemInterprete": true,
-        pos1: [50, 50],
-        pos2: [300, 100]
-    },
-    {
-        "frame": 1018,
-        "contemInterprete": false
-    },
-    {
-        "frame": 1678,
-        "contemInterprete": true,
-        pos1: [500, 500],
-        pos2: [300, 300]
-    }]
+    marcacoes = infoVideo["video"]["marcado"] ? infoVideo["video"]["marcacoes"] : []
 
     elementos.videoPlayer.src = `/videos/${videoNome}/video`
     if (elementos.videoPlayer.readyState < 3) await aguardarEvento(elementos.videoPlayer, 'loadeddata')
