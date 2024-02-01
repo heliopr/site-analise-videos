@@ -3,8 +3,10 @@ body {
 }
 
 #player {
-    width: 46%;
+    position: relative;
+    width: 55%;
     top: 5%;
+    left: 1%;
 }
 
 #canvas {
@@ -64,8 +66,8 @@ body {
 
 #painel {
     position: absolute;
-    width: 45%;
-    height: 600px;
+    width: 35%;
+    height: auto;
 
     right: 2%;
     top: 5%;
@@ -86,4 +88,35 @@ body {
 #frame-original {
     padding-left: 3%;
     font-size: 160%;
+}
+
+#editar-marcacao {
+    font-size: 150%;
+
+    margin-top: 50px;
+    margin-bottom: 30px;
+    margin-left: 3%;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #2e7d32;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
+
+#confirmar-edicao {
+    font-size: 150%;
+
+    margin-bottom: 30px;
+    margin-left: 3%;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #3ea543;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
 }

@@ -13,7 +13,9 @@ const elementos = {
     painel: document.querySelector("#painel"),
     tituloVideo: document.querySelector("#titulo-video"),
     frame: document.querySelector("#frame"),
-    frameOriginal: document.querySelector("#frame-original")
+    frameOriginal: document.querySelector("#frame-original"),
+    editarMarcacaoBotao: document.querySelector("#editar-marcacao"),
+    confirmarEdicaoBotao: document.querySelector("#confirmar-edicao")
 }
 
 const context = elementos.canvas.getContext('2d')
@@ -21,6 +23,9 @@ const context = elementos.canvas.getContext('2d')
 let frameAtual = 0
 let infoVideo = null
 let marcacoes = null
+let estaSegurandoMouse = false, mousePos = [0, 0]
+let selecaoPos1 = [0, 0], selecaoPos2 = [0, 0], selecionando = false, selecaoFrame = 0
+let editando = false
 
 function aguardarEvento(item, evento) {
     return new Promise((resolve) => {
@@ -32,6 +37,21 @@ function aguardarEvento(item, evento) {
     })
 }
 
+function editar() {
+    elementos.editarMarcacaoBotao.textContent = "Cancelar Edição"
+    elementos.editarMarcacaoBotao.style.backgroundColor = "#c62828"
+    elementos.confirmarEdicaoBotao.style.visibility = "visible"
+    editando = true
+}
+
+function uneditar() {
+    editando = false
+    elementos.editarMarcacaoBotao.style.backgroundColor = "#2e7d32"
+    elementos.editarMarcacaoBotao.textContent = "Editar Marcação"
+    elementos.confirmarEdicaoBotao.style.visibility = "hidden"
+    renderizarCanva()
+}
+
 function calcFrameOriginal(frame, fps) {
     if (frame < 3) return frame
     return Math.round((frame-2) * fps) - 2
@@ -40,11 +60,17 @@ function calcFrameOriginal(frame, fps) {
 function getMarcacaoAtual(frame) {
     if (!marcacoes) return null
     let marcacao = null
-    for (const marc of marcacoes) {
-        if (marc["frame"] <= frame && (!marcacao || marc["frame"] > marcacao["frame"]))
+    let j = -1
+
+    for (let i = 0; i < marcacoes.length; i++) {
+        const marc = marcacoes[i]
+        if (marc["frame"] <= frame && (!marcacao || marc["frame"] > marcacao["frame"])) {
             marcacao = marc
+            j = i
+        }
     }
-    return marcacao
+
+    return [ marcacao, j ]
 }
 
 function renderizarCursor() {
@@ -56,14 +82,15 @@ function renderizarCursor() {
     elementos.posicaoCursor.style.left = posx+"px"
 }
 
-function renderizarCanva(metadata) {
-    frameAtual = Math.round(metadata.mediaTime  * infoVideo["video"]["fps"])
-
-    const w = window.innerWidth-200
+function renderizarCanva() {
+    /*const w = window.innerWidth-200
     const h = window.innerHeight
     const size = Math.min(w,h)
     canvas.width = size*1.2
-    canvas.height = size*0.7
+    canvas.height = size*0.7*/
+    elementos.canvas.width = infoVideo["video"]["resolucao"][0]
+    elementos.canvas.height = infoVideo["video"]["resolucao"][1]
+
     context.drawImage(elementos.videoPlayer, 0, 0, canvas.width, canvas.height)
 
     renderizarSelecao()
@@ -75,17 +102,33 @@ function renderizarPainel() {
 }
 
 function renderizarSelecao() {
-    const marcacaoAtual = getMarcacaoAtual(calcFrameOriginal(frameAtual, infoVideo["video"]["fps"]))
-    if (marcacaoAtual && marcacaoAtual["contemInterprete"]) {
-        context.fillStyle = "rgba(255,255,0,0.5)"
-        const pos1 = marcacaoAtual["pos1"]
-        const pos2 = marcacaoAtual["pos2"]
-        context.fillRect(pos1[0], pos1[1], pos2[0]-pos1[0], pos2[1]-pos1[1]);
+    let pos1 = null, pos2 = null
+
+    if (selecionando && editando) {
+        pos1 = selecaoPos1
+        pos2 = selecaoPos2
+    }
+    else { 
+        const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+        const [ marcacaoAtual, i ] = getMarcacaoAtual(frameOrig)
+        if (marcacaoAtual && marcacaoAtual["contemInterprete"]) {
+            pos1 = marcacaoAtual["pos1"]
+            pos2 = marcacaoAtual["pos2"]
+        }
+    }
+
+    if (pos1 && pos2) {
+        context.fillStyle = "rgba(255,255,0, 0.3)"
+        context.fillRect(pos1[0], pos1[1], pos2[0]-pos1[0], pos2[1]-pos1[1])
     }
 }
 
 function renderizar(now, metadata) {
-    renderizarCanva(metadata)
+    frameAtual = Math.round(metadata.mediaTime  * infoVideo["video"]["fps"])
+    if (editando) uneditar()
+    if (selecionando && frameAtual != selecaoFrame) selecionando = false
+
+    renderizarCanva()
     renderizarPainel()
     if (infoVideo) renderizarCursor()
     elementos.videoPlayer.requestVideoFrameCallback(renderizar)
@@ -128,7 +171,9 @@ const f = async () => {
         return
     }
 
-    marcacoes = infoVideo["video"]["marcado"] ? infoVideo["video"]["marcacoes"] : null /*[{
+    console.log(infoVideo)
+
+    marcacoes = infoVideo["video"]["marcado"] ? infoVideo["video"]["marcacoes"] : [{
         "frame": 0,
         "contemInterprete": true,
         pos1: [50, 50],
@@ -143,7 +188,7 @@ const f = async () => {
         "contemInterprete": true,
         pos1: [500, 500],
         pos2: [300, 300]
-    }]*/
+    }]
 
     elementos.videoPlayer.src = `/videos/${videoNome}/video`
     if (elementos.videoPlayer.readyState < 3) await aguardarEvento(elementos.videoPlayer, 'loadeddata')
@@ -151,6 +196,8 @@ const f = async () => {
 
     elementos.conteudo.style.visibility = "visible"
     elementos.aguarde.style.visibility = "hidden"
+
+    elementos.tituloVideo.textContent = infoVideo["video"]["nome"]
 
     elementos.playBotao.addEventListener("click", () => {
         if (elementos.videoPlayer.paused) {
@@ -179,6 +226,46 @@ const f = async () => {
 
         elementos.velocidadeBotao.textContent = vel + "x"
         elementos.videoPlayer.playbackRate = vel
+    })
+
+    elementos.canvas.addEventListener("mousedown", (e) => {
+        if (!editando) return
+
+        selecionando = true
+        selecaoFrame = frameAtual
+        const res = infoVideo["video"]["resolucao"]
+        const rect = elementos.canvas.getBoundingClientRect()
+        selecaoPos1 = [((e.clientX - rect.left)/rect.width)*res[0], ((e.clientY - rect.top)/rect.height)*res[1]]
+        //console.log(selecaoPos1)
+    })
+
+    elementos.editarMarcacaoBotao.addEventListener("click", () => {
+        if (editando) {
+            uneditar()
+        }
+        else if (elementos.videoPlayer.paused) {
+            editar()
+        }
+    })
+
+    document.addEventListener("mousedown", () => {
+        estaSegurandoMouse = true
+    })
+
+    document.addEventListener("mouseup", () => {
+        estaSegurandoMouse = false
+    })
+
+    document.addEventListener("mousemove", (e) => {
+        mousePos = [e.clientX, e.clientY]
+        if (selecionando && editando) {
+            const rect = elementos.canvas.getBoundingClientRect()
+            if (estaSegurandoMouse && mousePos[0] >= rect.left && mousePos[0] < rect.left+rect.width && mousePos[1] >= rect.top && mousePos[1] < rect.top+rect.height) {
+                const res = infoVideo["video"]["resolucao"]
+                selecaoPos2 = [((e.clientX - rect.left)/rect.width)*res[0], ((e.clientY - rect.top)/rect.height)*res[1]]
+            }
+            renderizarCanva()
+        }
     })
 
     document.addEventListener("keypress", (e) => {
