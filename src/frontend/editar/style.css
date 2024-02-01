@@ -72,6 +72,8 @@ body {
     right: 2%;
     top: 5%;
 
+    padding-bottom: 10px;
+
     border: 1px solid #ccc;
     box-shadow: 3px 3px 5px #888888;
 }
@@ -90,10 +92,39 @@ body {
     font-size: 160%;
 }
 
+#criar-marcacao {
+    font-size: 150%;
+
+    margin-bottom: 30px;
+    margin-left: 3%;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #2e7d32;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
+
+#deletar-marcacao {
+    font-size: 150%;
+
+    margin-bottom: 30px;
+    margin-left: 3%;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #c62828;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
+
 #editar-marcacao {
     font-size: 150%;
 
-    margin-top: 50px;
     margin-bottom: 30px;
     margin-left: 3%;
 
@@ -115,6 +146,21 @@ body {
     color: #ffffff;
     border-radius: 5px;
     background-color: #3ea543;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
+
+#sem-interprete {
+    font-size: 150%;
+
+    margin-bottom: 30px;
+    margin-left: 3%;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #e68d29;
     border: 0;
     padding: 8px;
 

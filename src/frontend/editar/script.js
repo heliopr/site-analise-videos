@@ -15,7 +15,10 @@ const elementos = {
     frame: document.querySelector("#frame"),
     frameOriginal: document.querySelector("#frame-original"),
     editarMarcacaoBotao: document.querySelector("#editar-marcacao"),
-    confirmarEdicaoBotao: document.querySelector("#confirmar-edicao")
+    confirmarEdicaoBotao: document.querySelector("#confirmar-edicao"),
+    criarMarcacaoBotao: document.querySelector("#criar-marcacao"),
+    deletarMarcacaoBotao: document.querySelector("#deletar-marcacao"),
+    semInterpreteBotao: document.querySelector("#sem-interprete")
 }
 
 const context = elementos.canvas.getContext('2d')
@@ -38,18 +41,15 @@ function aguardarEvento(item, evento) {
 }
 
 function editar() {
-    elementos.editarMarcacaoBotao.textContent = "Cancelar Edição"
-    elementos.editarMarcacaoBotao.style.backgroundColor = "#c62828"
-    elementos.confirmarEdicaoBotao.style.visibility = "visible"
     editando = true
+    renderizarBotoes()
 }
 
 function uneditar() {
     editando = false
-    elementos.editarMarcacaoBotao.style.backgroundColor = "#2e7d32"
-    elementos.editarMarcacaoBotao.textContent = "Editar Marcação"
-    elementos.confirmarEdicaoBotao.style.visibility = "hidden"
+    selecionando = false
     renderizarCanva()
+    renderizarBotoes()
 }
 
 function calcFrameOriginal(frame, fps) {
@@ -65,12 +65,55 @@ function getMarcacaoAtual(frame) {
     for (let i = 0; i < marcacoes.length; i++) {
         const marc = marcacoes[i]
         if (marc["frame"] <= frame && (!marcacao || marc["frame"] > marcacao["frame"])) {
+            console.log("achei")
             marcacao = marc
             j = i
         }
     }
 
     return [ marcacao, j ]
+}
+
+function renderizarBotoes() {
+    console.log("renderizarBotoes")
+    const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+    const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+
+    elementos.criarMarcacaoBotao.hidden = true
+    elementos.confirmarEdicaoBotao.hidden = true
+    elementos.deletarMarcacaoBotao.hidden = true
+    elementos.editarMarcacaoBotao.hidden = true
+    elementos.semInterpreteBotao.hidden = true
+
+    if (marcacao && marcacao["frame"] == frameOrig) {
+        elementos.semInterpreteBotao.hidden = false
+        elementos.deletarMarcacaoBotao.hidden = false
+        if (marcacao["contemInterprete"]) {
+            elementos.semInterpreteBotao.textContent = "Sem Intérprete"
+            elementos.semInterpreteBotao.style.backgroundColor = "#e68d29"
+
+            elementos.editarMarcacaoBotao.hidden = false
+            elementos.deletarMarcacaoBotao.hidden = false
+            if (editando) {
+                elementos.confirmarEdicaoBotao.hidden = false
+                elementos.semInterpreteBotao.hidden = true
+                elementos.editarMarcacaoBotao.textContent = "Cancelar Edição"
+                elementos.editarMarcacaoBotao.style.backgroundColor = "#c62828"
+            }
+            else {
+                elementos.confirmarEdicaoBotao.hidden = true
+                elementos.editarMarcacaoBotao.style.backgroundColor = "#2e7d32"
+                elementos.editarMarcacaoBotao.textContent = "Editar Marcação"
+            }
+        }
+        else {
+            elementos.semInterpreteBotao.textContent = "Contém Intérprete"
+            elementos.semInterpreteBotao.style.backgroundColor = "#3ea543"
+        }
+    }
+    else {
+        elementos.criarMarcacaoBotao.hidden = false
+    }
 }
 
 function renderizarCursor() {
@@ -99,6 +142,8 @@ function renderizarCanva() {
 function renderizarPainel() {
     elementos.frame.textContent = "Frame: " + frameAtual
     elementos.frameOriginal.textContent = "Frame original: " + calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+
+    renderizarBotoes()
 }
 
 function renderizarSelecao() {
@@ -245,6 +290,80 @@ const f = async () => {
         }
         else if (elementos.videoPlayer.paused) {
             editar()
+        }
+    })
+
+    elementos.confirmarEdicaoBotao.addEventListener("click", () => {
+        if (editando && selecionando) {
+            const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+            const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+            console.log("AEEE " + frameOrig)
+            console.log(marcacao)
+            console.log(marcacoes)
+            if (marcacao && marcacao["frame"] == frameOrig) {
+                marcacao["pos1"][0] = Math.min(selecaoPos1[0], selecaoPos2[0])
+                marcacao["pos1"][1] = Math.min(selecaoPos1[1], selecaoPos2[1])
+                marcacao["pos2"][0] = Math.max(selecaoPos1[0], selecaoPos2[0])
+                marcacao["pos2"][1] = Math.max(selecaoPos1[1], selecaoPos2[1])
+                marcacao["contemInterprete"] = true
+            }
+            uneditar()
+        }
+    })
+
+    elementos.criarMarcacaoBotao.addEventListener("click", () => {
+        const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+        const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+
+        if (marcacao && marcacao["frame"] == frameOrig) return
+
+        const marc = {
+            frame: frameOrig,
+            contemInterprete: true,
+            pos1: [0, 0],
+            pos2: [0, 0]
+        }
+
+        if (marcacao && marcacao["contemInterprete"]) {
+            marc["pos1"] = [marcacao["pos1"][0], marcacao["pos1"][1]]
+            marc["pos2"] = [marcacao["pos2"][0], marcacao["pos2"][1]]
+        }
+
+        marcacoes.splice(i+1, 0, marc)
+
+        renderizarCanva()
+        renderizarBotoes()
+    })
+
+    elementos.deletarMarcacaoBotao.addEventListener("click", () => {
+        const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+        const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+
+        if (marcacao && marcacao["frame"] == frameOrig) {
+            marcacoes.splice(i, 1)
+            renderizarCanva()
+            renderizarBotoes()
+        }
+    })
+
+    elementos.semInterpreteBotao.addEventListener("click", () => {
+        const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+        const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+
+        if (marcacao && marcacao["frame"] == frameOrig) {
+            if (marcacao["contemInterprete"]) {
+                marcacao["contemInterprete"] = false
+                marcacao["pos1"] = null
+                marcacao["pos2"] = null
+            }
+            else {
+                marcacao["contemInterprete"] = true
+                marcacao["pos1"] = [0, 0]
+                marcacao["pos2"] = [0, 0]
+            }
+
+            renderizarCanva()
+            renderizarBotoes()
         }
     })
 
