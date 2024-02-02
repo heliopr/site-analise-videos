@@ -9,9 +9,12 @@ const elementos = {
     posicaoCursor: document.querySelector("#posicao-cursor"),
     playBotao: document.querySelector("#play"),
     velocidadeBotao: document.querySelector("#velocidade"),
+    proxBotao: document.querySelector("#prox"),
+    antBotao: document.querySelector("#ant"),
 
     painel: document.querySelector("#painel"),
     tituloVideo: document.querySelector("#titulo-video"),
+    salvarBotao: document.querySelector("#salvar"),
     frame: document.querySelector("#frame"),
     frameOriginal: document.querySelector("#frame-original"),
     editarMarcacaoBotao: document.querySelector("#editar-marcacao"),
@@ -24,11 +27,12 @@ const elementos = {
 const context = elementos.canvas.getContext('2d')
 
 let frameAtual = 0
-let infoVideo = null
+let infoVideo = null, infoMarc = null
 let marcacoes = null
 let estaSegurandoMouse = false, mousePos = [0, 0]
 let selecaoPos1 = [0, 0], selecaoPos2 = [0, 0], selecionando = false, selecaoFrame = 0
 let editando = false
+let salvando = false
 
 function aguardarEvento(item, evento) {
     return new Promise((resolve) => {
@@ -55,6 +59,11 @@ function uneditar() {
 function calcFrameOriginal(frame, fps) {
     if (frame < 3) return frame
     return Math.round((frame-2) * fps) - 2
+}
+
+function calcFrameCompr(frameOrig, fps) {
+    if (frameOrig < 3) return frameOrig
+    return Math.round((frameOrig+2)/fps)+2
 }
 
 function getMarcacaoAtual(frame) {
@@ -140,8 +149,10 @@ function renderizarCanva() {
 }
 
 function renderizarPainel() {
+    const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
     elementos.frame.textContent = "Frame: " + frameAtual
-    elementos.frameOriginal.textContent = "Frame original: " + calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
+    elementos.frameOriginal.textContent = "Frame original: " + frameOrig
+    //console.log(calcFrameCompr(frameOrig, infoVideo["video"]["fps"]))
 
     renderizarBotoes()
 }
@@ -216,9 +227,28 @@ const f = async () => {
         return
     }
 
-    console.log(infoVideo)
 
-    marcacoes = infoVideo["video"]["marcado"] ? infoVideo["video"]["marcacoes"] : []
+    try {
+        const r = await fetch(`/videos/${videoNome}/marcacoes`, {
+            method: "GET",
+            headers: {'Accept': 'application/json'},
+        })
+        infoMarc = await r.json()
+    }
+    catch (e) {
+        elementos.aguarde.textContent = "ERRO"
+        console.log(e)
+        alert("Um erro ocorreu ao requisitar informações sobre as marcações, tente recarregar a página")
+        return
+    }
+
+    if (!infoMarc || !infoMarc.sucesso) {
+        elementos.aguarde.textContent = "ERRO"
+        alert("Um erro ocorreu ao tentar requisitar informações sobre as marcações, tente recarregar a página")
+        return
+    }
+
+    marcacoes = infoMarc["marcacoes"] ? infoMarc["marcacoes"] : []
 
     elementos.videoPlayer.src = `/videos/${videoNome}/video`
     if (elementos.videoPlayer.readyState < 3) await aguardarEvento(elementos.videoPlayer, 'loadeddata')
@@ -286,10 +316,10 @@ const f = async () => {
             console.log(marcacao)
             console.log(marcacoes)
             if (marcacao && marcacao["frame"] == frameOrig) {
-                marcacao["pos1"][0] = Math.min(selecaoPos1[0], selecaoPos2[0])
-                marcacao["pos1"][1] = Math.min(selecaoPos1[1], selecaoPos2[1])
-                marcacao["pos2"][0] = Math.max(selecaoPos1[0], selecaoPos2[0])
-                marcacao["pos2"][1] = Math.max(selecaoPos1[1], selecaoPos2[1])
+                marcacao["pos1"][0] = Math.floor(Math.min(selecaoPos1[0], selecaoPos2[0]))
+                marcacao["pos1"][1] = Math.floor(Math.min(selecaoPos1[1], selecaoPos2[1]))
+                marcacao["pos2"][0] = Math.floor(Math.max(selecaoPos1[0], selecaoPos2[0]))
+                marcacao["pos2"][1] = Math.floor(Math.max(selecaoPos1[1], selecaoPos2[1]))
                 marcacao["contemInterprete"] = true
             }
             uneditar()
@@ -309,9 +339,14 @@ const f = async () => {
             pos2: [0, 0]
         }
 
-        if (marcacao && marcacao["contemInterprete"]) {
-            marc["pos1"] = [marcacao["pos1"][0], marcacao["pos1"][1]]
-            marc["pos2"] = [marcacao["pos2"][0], marcacao["pos2"][1]]
+        if (i > 0) {
+            for (let j = i; j >= 0; j--) {
+                const m = marcacoes[j]
+                if (m && m["contemInterprete"] && m["pos1"] && m["pos2"]) {
+                    marc["pos1"] = [m["pos1"][0], m["pos1"][1]]
+                    marc["pos2"] = [m["pos2"][0], m["pos2"][1]]
+                }
+            }
         }
 
         marcacoes.splice(i+1, 0, marc)
@@ -372,6 +407,42 @@ const f = async () => {
         }
     })
 
+    elementos.proxBotao.addEventListener("click", () => {
+        const fp = infoVideo["video"]["fps"]
+        const frameOrig = calcFrameOriginal(frameAtual, fp)
+        const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+
+        const m = marcacoes[marcacao ? i+1 : 0]
+        if (m) {
+            const f = calcFrameCompr(m["frame"], fp)
+            elementos.videoPlayer.currentTime = (f+1)/fp
+        }
+    })
+
+    elementos.antBotao.addEventListener("click", () => {
+        const fp = infoVideo["video"]["fps"]
+        const frameOrig = calcFrameOriginal(frameAtual, fp)
+        const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
+
+        if (!marcacao) return
+
+        let m = null
+
+        if (marcacao["frame"] == frameOrig) {
+            if (i > 0) {
+                m = marcacoes[i-1]
+            }
+        }
+        else {
+            m = marcacao
+        }
+
+        if (m) {
+            const f = calcFrameCompr(m["frame"], fp)
+            elementos.videoPlayer.currentTime = (f+1)/fp
+        }
+    })
+
     document.addEventListener("keypress", (e) => {
         if (elementos.videoPlayer.paused) {
             let d = 0
@@ -399,6 +470,41 @@ const f = async () => {
     
             elementos.videoPlayer.currentTime += d * (1 / infoVideo["video"]["fps"])
         }
+    })
+
+    elementos.salvarBotao.addEventListener("click", async () => {
+        if (salvando) return
+
+        salvando = true
+        let res = null
+        try {
+            const r = await fetch(`/videos/${videoNome}/marcacoes`, {
+                method: "POST",
+                body: JSON.stringify({marcacoes: marcacoes}),
+                headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+            })
+            res = await r.json()
+        }
+        catch (e) {
+            console.log("Erro ao salvar marcações:")
+            console.log(e)
+            alert("Um erro ocorreu ao tentar salvar marcações, acesse o console")
+            salvando = false
+            return
+        }
+
+        if (!res || !res.sucesso) {
+            console.log("Erro ao salvar marcações")
+            alert("Servidor rejeitou o pedido: '" + res.mensagem + "'")
+            salvando = false
+            return
+        }
+
+        if (res.sucesso) {
+            alert("Vídeo salvo com sucesso")
+        }
+
+        salvando = false
     })
 }
 

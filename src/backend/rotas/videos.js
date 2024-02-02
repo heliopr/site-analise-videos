@@ -112,6 +112,8 @@ router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (re
     const video = req.params["video"]
     const marcacoes = req.body["marcacoes"]
 
+    console.log(marcacoes)
+
     const videoInfo = await bd.videosCollection.findOne({nome: video})
 
     if (!videoInfo || !videos.includes(video)) {
