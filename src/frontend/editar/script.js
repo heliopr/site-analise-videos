@@ -21,7 +21,8 @@ const elementos = {
     confirmarEdicaoBotao: document.querySelector("#confirmar-edicao"),
     criarMarcacaoBotao: document.querySelector("#criar-marcacao"),
     deletarMarcacaoBotao: document.querySelector("#deletar-marcacao"),
-    semInterpreteBotao: document.querySelector("#sem-interprete")
+    semInterpreteBotao: document.querySelector("#sem-interprete"),
+    statusSele: document.querySelector("#status-sele")
 }
 
 const context = elementos.canvas.getContext('2d')
@@ -74,7 +75,7 @@ function getMarcacaoAtual(frame) {
     for (let i = 0; i < marcacoes.length; i++) {
         const marc = marcacoes[i]
         if (marc["frame"] <= frame && (!marcacao || marc["frame"] > marcacao["frame"])) {
-            console.log("achei")
+            //console.log("achei")
             marcacao = marc
             j = i
         }
@@ -84,7 +85,7 @@ function getMarcacaoAtual(frame) {
 }
 
 function renderizarBotoes() {
-    console.log("renderizarBotoes")
+    //console.log("renderizarBotoes")
     const frameOrig = calcFrameOriginal(frameAtual, infoVideo["video"]["fps"])
     const [ marcacao, i ] = getMarcacaoAtual(frameOrig)
 
@@ -258,6 +259,7 @@ const f = async () => {
     elementos.aguarde.style.visibility = "hidden"
 
     elementos.tituloVideo.textContent = infoVideo["video"]["nome"]
+    elementos.statusSele.value = infoVideo["video"]["marcado"] ? "marcado" : "nao-marcado"
 
     elementos.playBotao.addEventListener("click", () => {
         if (elementos.videoPlayer.paused) {
@@ -480,7 +482,7 @@ const f = async () => {
         try {
             const r = await fetch(`/videos/${videoNome}/marcacoes`, {
                 method: "POST",
-                body: JSON.stringify({marcacoes: marcacoes}),
+                body: JSON.stringify({marcacoes: marcacoes, marcado: elementos.statusSele.value == "marcado"? true : false}),
                 headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
             })
             res = await r.json()
@@ -494,7 +496,8 @@ const f = async () => {
         }
 
         if (!res || !res.sucesso) {
-            console.log("Erro ao salvar marcações")
+            console.log("Erro ao salvar marcações, resposta do servidor:")
+            console.log(res)
             alert("Servidor rejeitou o pedido: '" + res.mensagem + "'")
             salvando = false
             return
@@ -506,6 +509,8 @@ const f = async () => {
 
         salvando = false
     })
+
+    elementos.aguarde.remove()
 }
 
 f()

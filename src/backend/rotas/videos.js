@@ -111,8 +111,9 @@ router.get("/videos/:video/marcacoes", tentarAsync(async (req, res) => {
 router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (req, res) => {
     const video = req.params["video"]
     const marcacoes = req.body["marcacoes"]
+    const marcado = req.body["marcado"]
 
-    console.log(marcacoes)
+    //console.log(marcacoes)
 
     const videoInfo = await bd.videosCollection.findOne({nome: video})
 
@@ -126,7 +127,12 @@ router.post("/videos/:video/marcacoes", bodyParser.json(), tentarAsync(async (re
     }
 
     
-    const r = await bd.videosCollection.updateOne({nome: video}, {$set: {marcacoes: marcacoes}})
+    if (marcado !== undefined && typeof(marcado) == "boolean") {
+        await bd.videosCollection.updateOne({nome: video}, {$set: {marcacoes: marcacoes, marcado: marcado}})
+    }
+    else {
+        await bd.videosCollection.updateOne({nome: video}, {$set: {marcacoes: marcacoes}})
+    }
 
     res.status(200).json({ sucesso: true })
 }))

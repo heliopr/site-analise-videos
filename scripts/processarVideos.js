@@ -106,7 +106,7 @@ const f = async () => {
 
             //console.log(processadoMetadata)
 
-            console.log(processarMetadata)
+            //console.log(processarMetadata)
 
             bd.videosCollection.insertOne({
                 nome: videoArquivo,

@@ -8,6 +8,7 @@
         <h1 id="aguarde" style="visibility: hidden;">AGUARDE... Reinicie a página se demorar mais que alguns segundos</h1>
 
         <div id="conteudo" style="visibility: hidden;">
+            <button id="pg-principal" onclick="location.href = '/principal';">Página Principal</button>
             <div id="player">
                 <canvas id="canvas">
                 </canvas>
@@ -25,6 +26,11 @@
             <div id="painel">
                 <h1 id="titulo-video">Título do vídeo</h1>
                 <button id="salvar">Salvar</button>
+                <br>
+                <select id="status-sele" name="status">
+                    <option value="nao-marcado">Não Marcado</option>
+                    <option value="marcado">Marcado</option>
+                </select>
                 <p id="frame">Frame: x</p>
                 <p id="frame-original">Frame original: x</p>
                 <button id="criar-marcacao">Criar Marcação</button>

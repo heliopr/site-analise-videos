@@ -195,3 +195,24 @@ body {
 
     cursor: pointer;
 }
+
+#status-sele {
+    margin-left: 3%;
+    font-size: 120%;
+}
+
+#pg-principal {
+    font-size: 150%;
+
+    margin-top: 20px;
+    margin-left: 1%;
+    margin-bottom: 30px;
+
+    color: #ffffff;
+    border-radius: 5px;
+    background-color: #3ea543;
+    border: 0;
+    padding: 8px;
+
+    cursor: pointer;
+}
