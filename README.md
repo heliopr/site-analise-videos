@@ -5,7 +5,7 @@
 ### Processar vídeos
 1. Crie uma pasta `processar` com os videos para processar dentro dela
 2. Certifique-se que você possui as credenciais de acesso para o banco de dados no arquivo `.env`
-3. Rode `npm run processarVideos`
+3. Instale as dependências rodando `npm install` e em seguida rode o processamento `npm run processarVideos`
 4. Aguarde
 5. Vídeos processados vão estar na pasta `videos` e serão salvos também no banco de dados
 
